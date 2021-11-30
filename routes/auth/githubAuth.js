@@ -24,7 +24,7 @@ router.get("/github", passport.authenticate('github'))
 
 
 router.get("/github/callback", 
-passport.authenticate('github', {failureRedirect: process.env.FAILURE_REDIRECT_URL}), (req,res)=>{
+passport.authenticate('github', {failureRedirect: process.env.REDIRECT_URL}), (req,res)=>{
   
 
     var accessToken = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, {
