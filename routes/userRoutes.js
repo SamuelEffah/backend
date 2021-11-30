@@ -96,12 +96,12 @@ router.get("/:username", async(req,res)=>{
 })
 
 router.get("/search/:query", async(req,res)=>{
-    // try {
+    try {
         const users = await UserQuery.findByQuery(req.params.query)
         res.status(200).json({users})
-    // } catch (error) {
-    //     res.status(400).json({msg: "Something went wrong"})
-    // }
+    } catch (error) {
+        res.status(400).json({msg: "Something went wrong"})
+    }
    
 })
 
