@@ -9,7 +9,7 @@ router.get("/", async(req,res)=>{
         const users = await UserQuery.getUsers()
     res.status(200).json({users})
     } catch (error) {
-        res.status(400).json({msg: "Something went wrong"})
+        res.status(400).json({msg: error})
     }
    
 })
