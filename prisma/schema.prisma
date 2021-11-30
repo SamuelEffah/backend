@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  id String @id @default(uuid()) 
+  githubId String
+  email String? @unique
+  username String @unique
+  isBan Boolean @default(false)
+  isAdmin Boolean @default(false)
+  APIKey String?
+  hashedPassword String?
+  profileUrl String
+  currentActivity String?
+  isCreator Boolean @default(false)
+  fullname String 
+  ip String?
+  insertedAt DateTime @default(now())
+  podcasts Podcast[]
+  followers Follows[] @relation("follower")
+  following Follows[] @relation("following")
+  favorites Favorite[]
+
+}
+
+
+
+model Podcast{
+  id String @id @default(uuid())
+  name String 
+  description String 
+  subtitle String
+  isPublish Boolean
+  numOfListeners Int @default(0)
+  posterUrl String 
+  insertedAt DateTime @default(now())
+  numOfReports Int @default(0)
+  creator User @relation(fields: [creatorId], references: [id])
+  creatorId String
+  tags String[]
+  epsiodes Episode[]
+  favorites Favorite[]
+
+}
+
+
+model Episode{
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  fileName String 
+  isRemoved Boolean
+  insertedAt DateTime @default(now())
+  podcast Podcast @relation(fields: [podcastId], references: [id])
+  podcastId String
+
+  
+
+}
+
+model Favorite{
+  creator User @relation(fields: [creatorId], references: [id])
+  creatorId String
+  podcast Podcast @relation(fields: [podcastId], references: [id])
+  podcastId String
+   @@id([creatorId, podcastId])
+}
+model Follows{
+  follower    User @relation("follower", fields: [followerId], references: [id])
+  followerId  String
+  following   User @relation("following", fields: [followingId], references: [id])
+  followingId String
+  insertedAt DateTime @default(now())
+  @@id([followerId, followingId])
+}
+
+
+model Report{
+  id  Int @id @default(autoincrement())
+  msg String
+  issuerId String 
+  podcastId String 
+  isResolve Boolean
+  insertedAt DateTime @default(now())
+}
