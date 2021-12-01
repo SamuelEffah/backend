@@ -59,7 +59,11 @@ const getUsers = async(adminId)=>{
                 isCreator:true,
                 isAdmin:true,
                 podcasts: true,
-                favorites:true,
+                favorites:{
+                    select:{
+                        podcast:true
+                    }
+                },
                 followers:true,
                 isBan:true,
                 email:true,
@@ -87,10 +91,42 @@ const getUserById = async(id)=>{
             fullname:true,
             isCreator:true,
             isAdmin:true,
+            favorites:{
+                select:{
+                    podcast:true
+                }
+            },
             podcasts: true,
-            favorites:true,
-            followers:true,
-            following:true,
+            followers:{
+                select:{
+                    following:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+
+                        }
+                    }
+            }
+        },
+            following:{
+                select:{
+                    follower:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+
+                        }
+                    }
+                }
+            },
             insertedAt:true
         }
     })
@@ -110,10 +146,42 @@ const getUserByUsername = async(username)=>{
             fullname:true,
             isCreator:true,
             isAdmin:true,
-            favorites:true,
+            favorites:{
+                select:{
+                    podcast:true
+                }
+            },
             podcasts: true,
-            followers:true,
-            following:true,
+            followers:{
+                select:{
+                    following:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+
+                        }
+                    }
+            }
+        },
+            following:{
+                select:{
+                    follower:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+
+                        }
+                    }
+                }
+            },
             insertedAt:true
         }
     })
@@ -127,20 +195,58 @@ const getUserFollowers = async(username)=>{
             username,
         },
         select:{
-            followers:true
+            followers:{
+                select:{
+                    following:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+                            following:true,
+                            followers:true,
+                            insertedAt:true
+
+                        }
+                    }
+            }
+            }
         }
     })
+
+    return followers
 }
 
 const getUserFollowing= async(username)=>{
-    const followers = await prisma.user.findUnique({
+    const following = await prisma.user.findUnique({
         where:{
             username
         },
         select:{
-            following:true
+            following:{
+                select:{
+                    follower:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+                            following:true,
+                            followers:true,
+                            insertedAt:true
+
+                        }
+                    }
+                }
+            }
         }
     })
+
+    return following
 }
 
 
@@ -167,12 +273,12 @@ const getFollowInfo = async(userId, otherUserId)=>{
 }
 
 
-const updateUser = async(id,data)=>{
+const updateUser = async(data)=>{
     const updatedUser = await prisma.user.update({
         where:{
-            idß
+            id: data.id
         },
-        data,
+        data: data.data,
         select:{
             id:true,
             profileUrl:true,
@@ -180,10 +286,42 @@ const updateUser = async(id,data)=>{
             fullname:true,
             isCreator:true,
             isAdmin:true,
-            followers:true,
-            favorites:true,
+            favorites:{
+                select:{
+                    podcast:true
+                }
+            },
             podcasts: true,
-            following:true,
+            followers:{
+                select:{
+                    following:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+
+                        }
+                    }
+            }
+        },
+            following:{
+                select:{
+                    follower:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+
+                        }
+                    }
+                }
+            },
             insertedAt:true
         }
     })
@@ -221,10 +359,42 @@ const findByQuery = async(query)=>{
             fullname:true,
             isCreator:true,
             isAdmin:true,
-            favorites:true,
+            favorites:{
+                select:{
+                    podcast:true
+                }
+            },
             podcasts: true,
-            followers:true,
-            following:true,
+            followers:{
+                select:{
+                    following:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+
+                        }
+                    }
+            }
+        },
+            following:{
+                select:{
+                    follower:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+
+                        }
+                    }
+                }
+            },
             insertedAt:true
         },
         take:10
@@ -255,7 +425,11 @@ const getAdmin = async(adminId)=>{
             fullname:true,
             isCreator:true,
             isAdmin:true,
-            favorites:true,
+            favorites:{
+                select:{
+                    podcast:true
+                }
+            },
             podcasts: true,
             followers:true,
             following:true,
@@ -284,7 +458,11 @@ const promoteToCreator = async(data)=>{
                 isAdmin:true,
                 podcasts: true,
                 followers:true,
-                favorites:true,
+                favorites:{
+                    select:{
+                        podcast:true
+                    }
+                },
                 isBan:true,
                 email:true,
                 APIKey:true,
@@ -320,7 +498,11 @@ const banUser = async(data)=>{
                 followers:true,
                 isBan:true,
                 email:true,
-                favorites:true,
+                favorites:{
+                    select:{
+                        podcast:true
+                    }
+                },
                 APIKey:true,
                 following:true,
                 insertedAt:true

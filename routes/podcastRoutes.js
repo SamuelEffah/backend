@@ -2,6 +2,7 @@ const express = require("express")
 const router = express.Router()
 const PodcastQuery = require("../queries/podcastQuery")
 const FavoriteQuery = require("../queries/favoriteQuery")
+const UserQuery = require("../queries/userQuery")
 
 router.post("/creator/create", async(req,res)=>{
     try {
@@ -38,37 +39,37 @@ router.get("/filter/:tag", async(req,res)=>{
 })
 
 router.post("/user/favorite", async(req,res)=>{
-    if(req.body.action == "add"){
+    console.log('favorite  ', req.body.data)
+    if(req.body.data.action == "add"){
+      
         const addFav = await FavoriteQuery.addFavorite(req.body.data)
-        // console.log("add ", addFav)
-       
-        res.status(200).json({isFavorite: addFav})
+        const user = await UserQuery.getUserById(req.body.data.creatorId)
+        console.log("add fav user ", user)
+        res.status(200).json({isFavorite: addFav, user})
     }
-    if(req.body.action == "remove"){
+    if(req.body.data.action == "remove"){
+        console.log("remove ", req.body.data)
         const remFav = await FavoriteQuery.removeFavorite(req.body.data)
-        // console.log("add ", remFav)
-        res.status(200).json({msg: "safda"})
+        const user = await UserQuery.getUserById(req.body.data.creatorId)
+        // // console.log("add ", remFav)
+        // res.status(200).json({msg: "safda"})
+        console.log("rem fav user ", user)
+        res.status(200).json({isFavorite: remFav, user})
     }
-
+  
 })
 
 
 router.post("/check-favorite", async(req,res)=>{
+    // console.log(req.body.data)
     const fav = await FavoriteQuery.checkFav(req.body.data)
     // console.log("check fav ", fav)
-    res.status(200).json({isFavorite: false})
+    res.status(200).json({isFavorite: fav})
 
 })
 
 
-// router.get("/:id/favorite", async(req,res)=>{
-//     // try {
-//     //    const episodes = await PodcastQuery.getPodcastEpisodes(req.params.id)
-//     //     res.status(200).json({episodes})
-//     // } catch (error) {
-//     //     res.status(400).json({msg: "Something went wrong"})
-//     // }
-// })
+
 
 
 

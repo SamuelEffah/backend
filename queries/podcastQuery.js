@@ -171,6 +171,20 @@ const getPodcastByTag = async(tag)=>{
     return podcasts
 }
 
+const getUserFavorites = async(id)=>{
+    
+    const podcasts = await prisma.user.findUnique({
+        where:{
+            id
+        },
+        select:{
+            favorites:true
+        }
+    })
+
+    return podcasts
+}
+
 // const posts = await client.post.findMany({
 //     where: {
 //       NOT: {
@@ -193,5 +207,6 @@ module.exports = {
     incrementReports,
     createPodcast,
     getById,
-    getPodcastByTag
+    getPodcastByTag,
+    getUserFavorites
 }

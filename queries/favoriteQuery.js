@@ -2,9 +2,12 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const addFavorite= async(data)=>{
-
+    let favData = {
+        creatorId: data.creatorId,
+        podcastId: data.podcastId
+    }
     const fav = await prisma.favorite.create({
-        data,
+        data: favData,
         select:{
             podcast:true,
             creatorId: true,
@@ -20,6 +23,7 @@ const addFavorite= async(data)=>{
 }
 
 const checkFav = async(data)=>{
+  
     const fav= await prisma.favorite.findUnique({
         where:{
             creatorId_podcastId:{
@@ -48,8 +52,10 @@ const removeFavorite = async(data)=>{
             }
         }
     })
+
     
-    return delFav
+    
+    return false
 
 }
 

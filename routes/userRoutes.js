@@ -3,7 +3,7 @@ const express = require("express")
 const router = express.Router()
 const UserQuery = require("./../queries/userQuery")
 const ReportQuery = require("./../queries/reportQuery")
-
+const FollowQuery = require("./../queries/followQuery")
 router.get("/", async(req,res)=>{
     try {
         const users = await UserQuery.getUsers()
@@ -76,9 +76,10 @@ router.get("/admin/:id", async(req,res)=>{
 
 
 
-router.post("/edit", async(req,res)=>{
+router.post("/profile/edit", async(req,res)=>{
+
     try {
-        const user = await UserQuery.updateUser(req.body.data.id,req.body.data.data)
+        const user = await UserQuery.updateUser(req.body.data)
      res.status(200).json({user})
     } catch (error) {
         res.status(400).json({msg: "Something went wrong"})
@@ -106,21 +107,32 @@ router.get("/search/:query", async(req,res)=>{
 })
 
 
-router.get("/followers", async(req,res)=>{
-    try {
-        const followers = await UserQuery.getUserFollowers(req.params.username)
-        res.status(200).json({followers})
-    } catch (error) {
-        res.status(400).json({msg: "Something went wrong"})
-    }
+router.post("/following-user", async(req,res)=>{
+  
+    const following = await FollowQuery.followUser(req.body.data)
+
+    res.status(200).json(following)
+})
+router.post("/unfollow-user", async(req,res)=>{
    
+    const unfollow = await FollowQuery.unFollowUser(req.body.data)
+    
+    res.status(200).json(unfollow)
+})
+
+router.post("/check-follow", async(req,res)=>{
+    
+    const checkfoll = await FollowQuery.checkFollow(req.body.data)
+    
+
+    res.status(200).json(checkfoll)
 })
 
 
 router.get("/:username/followers", async(req,res)=>{
     try {
         const followers = await UserQuery.getUserFollowers(req.params.username)
-        res.status(200).json({followers})
+        res.status(200).json(followers)
     } catch (error) {
         res.status(400).json({msg: "Something went wrong"})
     }
@@ -130,7 +142,7 @@ router.get("/:username/followers", async(req,res)=>{
 router.get("/:username/following", async(req,res)=>{
     try {
         const following = await UserQuery.getUserFollowing(req.params.username)
-        res.status(200).json({following})
+        res.status(200).json(following)
     } catch (error) {
         res.status(400).json({msg: "Something went wrong"})
     }
