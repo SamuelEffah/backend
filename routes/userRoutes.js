@@ -26,17 +26,14 @@ router.post("/user-bots", async(req,res)=>{
 })
 
 router.post("/admin/:id/add/new-user",async(req,res)=>{
-    console.log(req.body.data)
-    console.log(req.ip)
-     await UserQuery.createUser(req,res)
- 
-    // const admin = await UserQuery.getAdmin(req.params.id)
-    // if(admin.id){
-    //     const newUser = await UserQuery.createUser(req.body.data,req.ip)
-    //     res.status(200).json({msg:"asdfasdfa"})
-
-    // }
-
+    try {
+    const admin = await UserQuery.getAdmin(req.params.id)
+    if(admin.id){
+        await UserQuery.createUser(req,res)
+    }
+    } catch (error) {
+        res.status(400).json({msg: "Something went wrong"})
+    }
 })
 
 router.get("/admin/allusers/:id", async(req,res)=>{

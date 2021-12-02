@@ -35,10 +35,6 @@ passport.authenticate('github', {failureRedirect: process.env.REDIRECT_URL}), (r
       });
       let url = process.env.REDIRECT_URL + "auth/?a=" + accessToken+"&r="+refreshToken
     
-   
-   
-    // console.log()
-    // console.log(refreshtoken)
     res.redirect(url)
 }
 )
