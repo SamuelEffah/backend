@@ -23,12 +23,14 @@ model User{
   currentActivity String?
   isCreator Boolean @default(false)
   fullname String 
+  softDelete Boolean @default(false)
   ip String?
   insertedAt DateTime @default(now())
   podcasts Podcast[]
   followers Follows[] @relation("follower")
   following Follows[] @relation("following")
   favorites Favorite[]
+  reports Report[]
 
 }
 
@@ -49,6 +51,7 @@ model Podcast{
   tags String[]
   epsiodes Episode[]
   favorites Favorite[]
+  reports Report[]
 
 }
 
@@ -87,8 +90,10 @@ model Follows{
 model Report{
   id  Int @id @default(autoincrement())
   msg String
+  issuer User @relation(fields: [issuerId], references: [id])
   issuerId String 
-  podcastId String 
+  podcast Podcast @relation(fields: [podcastId], references: [id])
+  podcastId String
   isResolve Boolean
   insertedAt DateTime @default(now())
 }

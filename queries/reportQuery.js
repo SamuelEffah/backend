@@ -4,15 +4,41 @@ const prisma = new PrismaClient();
 
 
 const issueReport = async(data)=>{
+    let reportData = {
+        issuerId: data.issuerId,
+        msg: data.msg,
+        isResolve: false,
+        podcastId: data.podcastId
+    }
     const report = await prisma.report.create({
-        data
+        data: reportData
     })
-    return report
+    if(report){
+        return {issue: true, msg:"Report Sent!"}
+    }
+    return {issue: false, msg: "Something went wrong"}
 }
 
 
 const getAllReport = async()=>{
-    const reports = await prisma.report.findMany()
+    const reports = await prisma.report.findMany({
+        select:{
+            issuer:{
+                select:{
+                    fullname:true,
+                    profileUrl:true,
+
+                }
+            },
+            podcast:{
+                select:{
+                    name:true
+                }
+            },
+            msg: true,
+            insertedAt:true
+        }
+    })
 
     return reports;
 }

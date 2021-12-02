@@ -3,6 +3,7 @@ const router = express.Router()
 const PodcastQuery = require("../queries/podcastQuery")
 const FavoriteQuery = require("../queries/favoriteQuery")
 const UserQuery = require("../queries/userQuery")
+const ReportQuery = require("../queries/reportQuery")
 
 router.post("/creator/create", async(req,res)=>{
     try {
@@ -13,6 +14,39 @@ router.post("/creator/create", async(req,res)=>{
          res.status(400).json({msg: "Something went wrong"})
      }
 })
+
+
+router.post("/podcast-bots", async(req,res)=>{
+   
+    console.log(req.body.data)
+    req.body.data.forEach(async(element) => {
+        await PodcastQuery.createPodcast(element)
+    });
+    // const user = await PodcastQuery.createPodcast(req.body.data.podcast)
+    res.status(200).json({msg: "Sasdfas"})
+
+    // try {
+    //     const bots = await PodcastQuery.createListPodcast(req.body.data)
+    //      res.status(200).json({bots})
+    //  } catch (error) {
+    //      res.status(400).json({msg: "Something went wrong"})
+    //  }
+   
+ 
+})
+
+router.post("/user/report", async(req,res)=>{
+    try {
+        const issue = await ReportQuery.issueReport(req.body.data)
+   
+        res.status(200).json(issue)
+       
+     } catch (error) {
+         res.status(400).json({msg: "Something went wrong"})
+     }
+   
+})
+
 
 router.get("/:id", async(req,res)=>{
     try {

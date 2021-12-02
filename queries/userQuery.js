@@ -1,6 +1,95 @@
 const { PrismaClient } = require('@prisma/client');
 const PodcastQuery = require("./podcastQuery")
 const prisma = new PrismaClient();
+const bcrypt = require("bcryptjs")
+
+
+
+const createBots = async(data)=>{
+    const userBots = await prisma.user.createMany({
+        data
+    })
+
+    return userBots
+}
+
+
+const topCreators =  async()=>{
+
+    const creators = await prisma.user.findMany({
+        where:{
+            AND:[
+                {
+                    podcasts:{
+                        some:{
+                            numOfListeners:{
+                                gte:10
+                            }
+                        }
+                }
+            },
+            {
+               NOT:{
+                   softDelete:true
+               }
+            }
+
+            ]
+           
+            
+        },
+        select:{
+            id:true,
+            profileUrl:true,
+            username:true,
+            fullname:true,
+            isCreator:true,
+            isAdmin:true,
+            favorites:{
+                select:{
+                    podcast:true
+                }
+            },
+            podcasts: true,
+            followers:{
+                select:{
+                    following:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+
+                        }
+                    }
+            }
+        },
+            following:{
+                select:{
+                    follower:{
+                        select:{
+                            id:true,
+                            profileUrl:true,
+                            username:true,
+                            fullname:true,
+                            isCreator:true,
+                            isAdmin:true,
+
+                        }
+                    }
+                }
+            },
+            insertedAt:true
+        }
+    })
+
+    
+
+    return creators
+
+}
 
 
 const findOrCreate = async(profile,cb)=>{
@@ -39,17 +128,59 @@ const findOrCreate = async(profile,cb)=>{
 }
 
 
-const createUser = async(data)=>{
-    const newUser = await prisma.user.create({
-        data
+const createUser = async(req,res)=>{
+    let data = req.body.data
+    bcrypt.genSalt(10,function(err,salt){
+        bcrypt.hash(data.password,salt,async(err,hash)=>{
+            if(err){
+                res.status(400).json({msg:"Something went wrong"})
+            }
+            let userData = {
+                fullname: data.fullname,
+                username: data.username,
+                email: data.email,
+                hashedPassword: hash,
+                githubId: data.githubId,
+                profileUrl: data.profileUrl,
+                isAdmin: data.isAdmin,
+                isCreator: false,
+                ip: req.ip,
+            }
+            const newUser = await prisma.user.create({
+                data:userData
+            })
+            if(newUser){
+                res.status(200).json({status:true})
+            }
+            else{
+                res.status(400).json({msg:"Something went wrong"})
+            }
+            
+        })
     })
-    return newUser
+
+   
 }
 
 const getUsers = async(adminId)=>{
     const admin = await getAdmin(adminId)
     if(admin && admin.isAdmin){
         const users = await prisma.user.findMany({
+            where:{
+                AND:[
+            {
+                NOT:{
+                    isAdmin: true
+                }
+            },
+            {
+                NOT:{
+                    softDelete:true 
+                }
+            }
+                ]
+              
+            },
             select:{
                 id:true,
                 githubId:true,
@@ -69,7 +200,8 @@ const getUsers = async(adminId)=>{
                 email:true,
                 APIKey:true,
                 following:true,
-                insertedAt:true
+                insertedAt:true,
+                ip:true
             }
         })
        
@@ -82,7 +214,7 @@ const getUsers = async(adminId)=>{
 const getUserById = async(id)=>{
     const user = await prisma.user.findUnique({
         where: {
-            id
+            id,
         },
         select:{
             id:true,
@@ -135,9 +267,19 @@ const getUserById = async(id)=>{
 
 
 const getUserByUsername = async(username)=>{
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
         where:{
-            username
+            AND:[
+                {
+                    username:username
+                },
+                {
+                 NOT:{
+                     softDelete:true
+                 }  
+                }
+            ]
+            
         },
         select:{
             id:true,
@@ -190,9 +332,18 @@ const getUserByUsername = async(username)=>{
 }
 
 const getUserFollowers = async(username)=>{
-    const followers = await prisma.user.findUnique({
+    const followers = await prisma.user.findFirst({
         where:{
-            username,
+            AND:[
+                {
+                    username:username
+                },
+                {
+                 NOT:{
+                     softDelete:true
+                 }  
+                }
+            ]
         },
         select:{
             followers:{
@@ -220,9 +371,18 @@ const getUserFollowers = async(username)=>{
 }
 
 const getUserFollowing= async(username)=>{
-    const following = await prisma.user.findUnique({
+    const following = await prisma.user.findFirst({
         where:{
-            username
+            AND:[
+                {
+                    username:username
+                },
+                {
+                 NOT:{
+                     softDelete:true
+                 }  
+                }
+            ]
         },
         select:{
             following:{
@@ -397,7 +557,7 @@ const findByQuery = async(query)=>{
             },
             insertedAt:true
         },
-        take:10
+        take:5
     })
 
     return users
@@ -405,12 +565,7 @@ const findByQuery = async(query)=>{
 
 
 
-const createBots = async(data)=>{
-    const bots = await prisma.user.createMany({
-    data,
-    skipDuplicates: true 
-    })
-}
+
 
 
 const getAdmin = async(adminId)=>{
@@ -591,27 +746,67 @@ const statsCategory = async()=>{
 
 
 // TODO select following with currentActivity only
-const getFollowingActivity = async(id)=>{
-    const users = await prisma.user.findMany({
+const getFollowingActivity = async(username)=>{
+    const user = await prisma.user.findFirst({
         where:
         {
-            id
+            AND:[
+                {
+                    username:username
+                },
+                {
+                 NOT:{
+                     softDelete:true
+                 }  
+                }
+            ]
         },
-        select:{
-         following:true
-        }
+      
+        include:{
+            following:{
+               where:{
+                 follower:{
+                     isNot:{
+                         currentActivity: null
+                     }
+                 }
+                 
+               },
+               select:{
+                   follower:{
+                       select:{
+                        id:true,
+                        profileUrl:true,
+                        username:true,
+                        fullname:true,
+                        isCreator:true,
+                        isAdmin:true,
+                        currentActivity:true,
+                        followers:true,
+                        following:true,
+                        insertedAt:true
+                       }
+                   }
+               }
+            }
+        },
+      
+
 
     })
 
-    return users
+    return user.following
 }
 
 const removeUser = async(data)=>{
     const admin =await getAdmin(data.adminId)
     if(admin && admin.isAdmin){
-        const removedUser = await prisma.user.delete({
+        const removedUser = await prisma.user.update({
             where:{
                 id: data.userId
+            },
+            data:{
+                softDelete:true
             }
         })
        if(removedUser){
@@ -645,5 +840,7 @@ module.exports ={
     findOrCreate,
     getAdmin,
     stats,
-    statsCategory
+    statsCategory,
+    createBots,
+    topCreators
 }

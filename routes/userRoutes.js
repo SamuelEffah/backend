@@ -4,16 +4,40 @@ const router = express.Router()
 const UserQuery = require("./../queries/userQuery")
 const ReportQuery = require("./../queries/reportQuery")
 const FollowQuery = require("./../queries/followQuery")
+const PodcastQuery = require("./../queries/podcastQuery")
+
 router.get("/", async(req,res)=>{
     try {
         const users = await UserQuery.getUsers()
-    res.status(200).json({users})
+         res.status(200).json({users})
     } catch (error) {
-        res.status(400).json({msg: error})
+        res.status(400).json({msg: "Something went wrong"})
     }
    
 })
 
+router.post("/user-bots", async(req,res)=>{
+    try {
+        const bots = await UserQuery.createBots(req.body.data)
+         res.status(200).json({bots})
+    } catch (error) {
+        res.status(400).json({msg: "Something went wrong"})
+    }
+})
+
+router.post("/admin/:id/add/new-user",async(req,res)=>{
+    console.log(req.body.data)
+    console.log(req.ip)
+     await UserQuery.createUser(req,res)
+ 
+    // const admin = await UserQuery.getAdmin(req.params.id)
+    // if(admin.id){
+    //     const newUser = await UserQuery.createUser(req.body.data,req.ip)
+    //     res.status(200).json({msg:"asdfasdfa"})
+
+    // }
+
+})
 
 router.get("/admin/allusers/:id", async(req,res)=>{
     try {
@@ -39,9 +63,10 @@ router.post("/admin/ban/user", async(req,res)=>{
 router.post("/admin/delete/user", async(req,res)=>{
     try {
         const status = await UserQuery.removeUser(req.body.data)
+       
         res.status(200).json({status})
     } catch (error) {
-        res.status(400).json({msg: "Something went wrong"})
+        res.status(400).ßjson({msg: "Something went wrong"})
     }
 })
 
@@ -52,6 +77,22 @@ router.post("/admin/promote/user", async(req,res)=>{
     } catch (error) {
         res.status(400).json({msg: "Something went wrong"})
     }
+})
+
+router.get("/admin/:id/podcast/reports", async(req,res)=>{
+    const admin = await UserQuery.getAdmin(req.params.id)
+    if(admin.id){
+ 
+        try {
+            const reports = await ReportQuery.getAllReport()
+       
+        res.status(200).json({reports})
+
+        } catch (error) {
+            res.status(400).json({msg: "Something went wrong"})
+        }
+    }
+
 })
 
 
@@ -99,7 +140,9 @@ router.get("/:username", async(req,res)=>{
 router.get("/search/:query", async(req,res)=>{
     try {
         const users = await UserQuery.findByQuery(req.params.query)
-        res.status(200).json({users})
+        const podcasts = await PodcastQuery.searchPodcatsByQuery(req.params.query)
+       
+        res.status(200).json({users: [...users,...podcasts]})
     } catch (error) {
         res.status(400).json({msg: "Something went wrong"})
     }
@@ -107,11 +150,24 @@ router.get("/search/:query", async(req,res)=>{
 })
 
 
+router.get("/podcast/top-creators", async(req,res)=>{
+    try {
+    const creators = await UserQuery.topCreators()
+    res.status(200).json({creators})
+    }catch (error) {
+        res.status(400).json({msg: "Something went wrong"})
+    }
+})
+
+
 router.post("/following-user", async(req,res)=>{
-  
+  try{
     const following = await FollowQuery.followUser(req.body.data)
 
     res.status(200).json(following)
+  }catch (error) {
+        res.status(400).json({msg: "Something went wrong"})
+    }
 })
 router.post("/unfollow-user", async(req,res)=>{
    
@@ -150,13 +206,15 @@ router.get("/:username/following", async(req,res)=>{
 })
 
 router.get("/:username/following/activity", async(req,res)=>{
-    // try {
-        const following = await UserQuery.getFollowingActivity(req.params.username)
-      
-        res.status(200).json({following})
-    // } catch (error) {
-    //     res.status(400).json({msg: "Something went wrong"})
-    // }
+
+        try {
+            const following = await UserQuery.getFollowingActivity(req.params.username)
+            res.status(200).json({following})
+        } catch (error) {
+            res.status(400).json({msg: "Something went wrong"})
+        }
+    
+  
    
 })
 

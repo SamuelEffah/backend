@@ -5,11 +5,25 @@ const getByUserId = async(id)=>{
     const podcasts = await prisma.podcast.findMany({
         where:{
             creatorId: id
+        },
+        include:{
+            epsiodes:{
+                select:{
+                    fileName:true,
+                    name:true,
+                    id:true,
+                    description:true,
+                    insertedAt: true
+                  }
+            }
         }
     })
 
     return podcasts
 }
+
+
+
 
 const getAllPodcasts = async()=>{
     const podcasts = await prisma.podcast.findMany({
@@ -28,7 +42,17 @@ const getById = async(id)=>{
     return podcast
 }
 
-// TODO: add tags to podcast schema
+
+
+const createListPodcast =async(data)=>{
+
+    const podcasts = await prisma.podcast.createMany({
+        data,
+    })
+
+    return podcasts
+}
+
 const createPodcast = async(data)=>{
     let podcastData = {
         name: data.name,
@@ -74,11 +98,70 @@ const createPodcast = async(data)=>{
 
 }
 
+const searchPodcatsByQuery = async(query)=>{
+    const podcasts = await prisma.podcast.findMany({
+        where:{
+            OR:[
+                {
+                    name:{
+                        endsWith: query,
+                        mode: "insensitive"
+                    } 
+                },
+                {
+                    AND:{
+                        name:{
+                            startsWith: query,
+                            mode: "insensitive"
+                        }
+                    }
+                }
+            ]
+        },
+        include:{
+            creator:{
+                select:{
+                    fullname:true
+                }
+            },
+            epsiodes:{
+                select:{
+                  fileName:true,
+                  name:true,
+                  id:true,
+                  insertedAt: true
+                }
+            }
+        },
+        take:5,
+        orderBy: {
+            numOfListeners: "desc"
+        }
+    })
+    return podcasts
+
+}
+
 const getTopPodcasts = async()=>{
     const podcasts = await prisma.podcast.findMany({
         where:{
             numOfListeners:{
                 gt: 10 
+            }
+        },
+        include:{
+            creator:{
+                select:{
+                    fullname:true
+                }
+            },
+            epsiodes:{
+                select:{
+                  fileName:true,
+                  name:true,
+                  id:true,
+                  insertedAt: true
+                }
             }
         },
         take:10,
@@ -92,6 +175,21 @@ const getTopPodcasts = async()=>{
 const getLatestPodcast = async()=>{
     const podcasts = await prisma.podcast.findMany({
         take:10,
+        include:{
+            creator:{
+                select:{
+                    fullname:true
+                }
+            },
+            epsiodes:{
+                select:{
+                  fileName:true,
+                  name:true,
+                  id:true,
+                  insertedAt: true
+                }
+            }
+        },
         orderBy: {
             insertedAt: "desc"
         }
@@ -208,5 +306,7 @@ module.exports = {
     createPodcast,
     getById,
     getPodcastByTag,
-    getUserFavorites
+    getUserFavorites,
+    createListPodcast,
+    searchPodcatsByQuery
 }
