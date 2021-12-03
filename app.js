@@ -24,8 +24,10 @@ app.use(session({
         maxAge: 24*60*60*1000
     }
 }))
-app.use(cors())
-app.options("*", cors())
+app.use(cors({
+    origin:["http://localhost:3000", "https://nostalgic-goldstine-c60717.netlify.app"]
+}))
+
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(express.json())
@@ -35,14 +37,7 @@ app.use(express.urlencoded({extended: true}))
 
 SocketHandler.start(io)
 
-// io.on("connection", (socket) => {
-//     console.log("user connected")
-//     // socket.on("message", (data)=>{
-//     //     console.log(data)
-//     // })
-// })
 
-// 
 const UserQuery = require("./queries/userQuery")
 
 //routes 
