@@ -115,11 +115,10 @@ router.get("/episodes/:id", async(req,res)=>{
 })
 
 
-router.post("/edit", async(req,res)=>{
-   
-    try {
-        const podcast = await PodcastQuery.updatePodcast(req.body.data.id, req.body.data)
-        
+router.post("/creator/edit", async(req,res)=>{
+    try{
+        const podcast = await PodcastQuery.updatePodcast(req.body.data)
+      
         res.status(200).json({podcast})
      } catch (error) {
         res.status(400).json({msg: "Something went wrong"})

@@ -257,12 +257,18 @@ const deletePodcast = async(id)=>{
 
 
 
-const updatePodcast = async(id,data)=>{
+const updatePodcast = async(data)=>{
+    let editPodcast = {
+        name: data.name,
+        description: data.description,
+        tags: data.tags,
+        subtitle: data.subtitle
+    }
     const updatedPodcast = await prisma.podcast.update({
         where:{
-            id
+            id: data.id
         },
-        data
+        data: editPodcast
     })
     return updatedPodcast
 }
