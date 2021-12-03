@@ -17,12 +17,12 @@ router.get("/", async(req,res)=>{
 })
 
 router.post("/user-bots", async(req,res)=>{
-    try {
+    // try {
         const bots = await UserQuery.createBots(req.body.data)
          res.status(200).json({bots})
-    } catch (error) {
-        res.status(400).json({msg: "Something went wrong"})
-    }
+    // } catch (error) {
+    //     res.status(400).json({msg: "Something went wrong"})
+    // }
 })
 
 router.post("/admin/:id/add/new-user",async(req,res)=>{

@@ -1,12 +1,19 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const UserQuery = require("./userQuery")
-const getByUserId = async(id)=>{
+
+
+
+const getByUserPodcastId = async(id)=>{
     const podcasts = await prisma.podcast.findMany({
         where:{
             creatorId: id
         },
         include:{
+            creator:{
+                select:{
+                    fullname:true
+                }
+            },
             epsiodes:{
                 select:{
                     fileName:true,
@@ -83,9 +90,39 @@ const createPodcast = async(data)=>{
         })
 
         if(newEpisode){
-           const creator  = await UserQuery.getUserById(data.creatorId)
+           const creator  = await prisma.user.findUnique({
+                where:{
+                    id:data.creatorId
+                }   
+            
+            })
             if(!creator.isCreator){
-               const newCreator = await UserQuery.promoteToCreator(data.creatorId)
+               const newCreator = await prisma.user.update({
+                   where:{
+                       id: data.creatorId
+                   },
+                   select:{
+                    id:true,
+                    githubId:true,
+                    profileUrl:true,
+                    username:true,
+                    fullname:true,
+                    isCreator:true,
+                    isAdmin:true,
+                    podcasts: true,
+                    followers:true,
+                    favorites:{
+                        select:{
+                            podcast:true
+                        }
+                    },
+                    isBan:true,
+                    email:true,
+                    APIKey:true,
+                    following:true,
+                    insertedAt:true
+                   }
+                   })
                return newCreator
             }
             return creator
@@ -294,7 +331,7 @@ const getUserFavorites = async(id)=>{
 //   })
 
 module.exports = {
-    getByUserId,
+    getByUserPodcastId,
     getAllPodcasts,
     getLatestPodcast,
     getPodcastEpisodes,

@@ -1,5 +1,4 @@
 const { PrismaClient } = require('@prisma/client');
-const PodcastQuery = require("./podcastQuery")
 const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs")
 
@@ -691,15 +690,24 @@ const stats = async(adminId, admin)=>{
 
   
 }
-
+const getPodcastUserByTag = async(tag)=>{
+    const podcasts = await prisma.podcast.findMany({
+        where:{
+            tags:{
+                has:tag
+            }
+        }
+    })
+    return podcasts
+}
 
 const statsCategory = async()=>{
-      const sizeLH = await (await PodcastQuery.getPodcastByTag("lifestyle & health")).length
-      const sizeAE = await (await PodcastQuery.getPodcastByTag("art & entertainment")).length
-      const sizeNP = await (await PodcastQuery.getPodcastByTag("news & politics")).length
-      const sizeSP = await (await PodcastQuery.getPodcastByTag("sports")).length
-      const sizeC = await (await PodcastQuery.getPodcastByTag("comedy")).length
-      const sizeBT = await (await PodcastQuery.getPodcastByTag("business & technology")).length
+      const sizeLH = await (await getPodcastUserByTag("lifestyle & health")).length
+      const sizeAE = await (await getPodcastUserByTag("art & entertainment")).length
+      const sizeNP = await (await getPodcastUserByTag("news & politics")).length
+      const sizeSP = await (await getPodcastUserByTag("sports")).length
+      const sizeC = await (await getPodcastUserByTag("comedy")).length
+      const sizeBT = await (await getPodcastUserByTag("business & technology")).length
      
       const Categories = [
         {

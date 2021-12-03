@@ -6,10 +6,10 @@ const UserQuery = require("../queries/userQuery")
 const ReportQuery = require("../queries/reportQuery")
 
 router.post("/creator/create", async(req,res)=>{
-    try {
+   try{
         const user = await PodcastQuery.createPodcast(req.body.data.podcast)
-        
-         res.status(200).json({user})
+       res.status(204)
+    //      res.status(200).json({user})
      } catch (error) {
          res.status(400).json({msg: "Something went wrong"})
      }
@@ -45,7 +45,7 @@ router.post("/user/report", async(req,res)=>{
 
 router.get("/:id", async(req,res)=>{
     try {
-       const podcasts = await PodcastQuery.getByUserId(req.params.id)
+       const podcasts = await PodcastQuery.getByUserPodcastId(req.params.id)
         res.status(200).json({podcasts})
     } catch (error) {
         res.status(400).json({msg: "Something went wrong"})
