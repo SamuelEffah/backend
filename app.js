@@ -24,9 +24,14 @@ app.use(session({
         maxAge: 24*60*60*1000
     }
 }))
+const corsOptions = {
+    
+}
 app.use(cors({
-    origin:["http://localhost:3000", "https://nostalgic-goldstine-c60717.netlify.app"]
-}))
+    origin:["http://localhost:3000", "https://nostalgic-goldstine-c60717.netlify.app"],
+    methods: "GET, POST"
+}
+))
 
 app.use(passport.initialize())
 app.use(passport.session())
