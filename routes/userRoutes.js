@@ -63,7 +63,7 @@ router.post("/admin/delete/user", async(req,res)=>{
        
         res.status(200).json({status})
     } catch (error) {
-        res.status(400).ßjson({msg: "Something went wrong"})
+        res.status(400).json({msg: "Something went wrong"})
     }
 })
 

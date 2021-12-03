@@ -24,9 +24,7 @@ app.use(session({
         maxAge: 24*60*60*1000
     }
 }))
-const corsOptions = {
-    
-}
+
 app.use(cors({
     origin:["http://localhost:3000", "https://nostalgic-goldstine-c60717.netlify.app"],
     methods: "GET, POST, PUT"
@@ -78,9 +76,13 @@ app.use("/auth", AuthRoutes)
 
 
 
-
+//comment out when running test 
 const PORT = process.env.PORT || 4001
 
+//comment out when running test
 server.listen(PORT, ()=>{
     console.log(`app listening of http://localhost:${PORT}`)
 })
+
+// uncomment for tests run 
+// module.exports = app
