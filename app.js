@@ -29,7 +29,7 @@ const corsOptions = {
 }
 app.use(cors({
     origin:["http://localhost:3000", "https://nostalgic-goldstine-c60717.netlify.app"],
-    methods: "GET, POST"
+    methods: "GET, POST, PUT"
 }
 ))
 
