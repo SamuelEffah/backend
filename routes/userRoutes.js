@@ -210,8 +210,16 @@ router.get("/:username/following/activity", async(req,res)=>{
         } catch (error) {
             res.status(400).json({msg: "Something went wrong"})
         }
-    
-  
+   
+})
+
+router.get("/podcast/:id/favorites", async(req,res)=>{
+    try {
+        const user = await UserQuery.getUserById(req.params.id)
+        res.status(200).json({favorites: user.favorites})
+    } catch (error) {
+        res.status(400).json({msg: "Something went wrong"})
+    }
    
 })
 

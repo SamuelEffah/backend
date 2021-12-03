@@ -224,7 +224,26 @@ const getUserById = async(id)=>{
             isAdmin:true,
             favorites:{
                 select:{
-                    podcast:true
+                    podcast:{
+                       
+                        include:{
+                            epsiodes:{
+                               select:{
+                                   id:true,
+                                   name: true,
+                                   fileName: true,
+                                   insertedAt: true,
+                        
+                               } 
+                            },
+                            creator:{
+                                select:{
+                                    fullname:true
+                                }
+                            }
+
+                        }
+                    }
                 }
             },
             podcasts: true,
