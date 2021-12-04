@@ -1,6 +1,9 @@
 const passport = require("passport")
 const express = require("express")
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 const router = express.Router()
+const bcrypt = require("bcryptjs")
 const GitHubStrategy = require("passport-github").Strategy
 const UserQuery = require("./../../queries/userQuery")
 const {generateToken, verifyToken} = require("./../../utils/token")
@@ -38,6 +41,39 @@ passport.authenticate('github', {failureRedirect: process.env.REDIRECT_URL}), (r
     res.redirect(url)
 }
 )
+
+
+
+
+ 
+ 
+
+ 
+  // if(isUser){
+  //   bcrypt.compare(password, isUser.hashedPassword, (err,claim)=>{
+  //     if(err){
+  //       console.log("cons ", err)
+       
+  //      return res.status(404).json({msg: "something went wrong"})
+  //     }
+  //     if(claim){
+  //       console.log("claim", claim)
+  //     //   var accessToken = jwt.sign({ id: isUser.id}, process.env.JWT_SECRET, {
+  //     //     expiresIn: 86400 // expires in 24 hours
+  //     //   });
+  //     // var refreshToken = jwt.sign({ id:isUser.id }, process.env.JWT_SECRET, {
+  //     //     expiresIn: 60*60*24*30 // expires in 24 hours
+  //     //   });
+  //      return res.status(200).json({a: "", r:"afasdf"})
+  //     }
+  //   })
+  // }
+  // else {
+    
+  //   res.status(404).json({msg: "something went wrong"})
+  // }
+
+
 
 module.exports ={
     passport,

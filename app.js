@@ -3,11 +3,14 @@ require("dotenv").config();
 const express = require("express")
 const app = express()
 const cors = require("cors")
+const { PrismaClient } = require('@prisma/client');
 const session = require("express-session")
 const {checkAuth} = require("./middleware/checkAuth")
 const http = require('http');
 const server = http.createServer(app);
-
+const jwt = require("jsonwebtoken")
+const bcrypt = require("bcryptjs")
+const prisma = new PrismaClient();
 const {Server} = require("socket.io")
 const io = new Server(server,{ cors: { origin: '*' } })
 const SocketHandler = require("./routes/socketHandler")
@@ -15,7 +18,7 @@ const {passport,router:AuthRoutes} = require("./routes/auth/githubAuth")
 
 // app middleware 
 app.use(session({
-    secret: "keyboard cat",
+    secret: "fasd43knf8cafsas",
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -60,9 +63,39 @@ passport.deserializeUser((user,cb)=>{
 
 
 // routes 
-app.get("/", (req,res)=>{
-    res.status(200).json({msg:"hello"})
-})
+
+app.post("/api/v1/local/login", async(req,res)=>{
+   
+    let email = req.body.data.email
+    let password = req.body.data.password
+  
+    
+   const user =  await prisma.user.findUnique({
+      where:{
+        email
+      },
+      select:{
+        id:true,
+        hashedPassword: true
+      }
+    })
+     const gn = await bcrypt.compare(password, user.hashedPassword)
+      
+     if(gn === false){
+      
+        res.json({msg:"asfasdf"})
+     }
+      else{
+        var accessToken = jwt.sign({ id: user.id}, process.env.JWT_SECRET, {
+            expiresIn: 86400 // expires in 24 hours
+          });
+        var refreshToken = jwt.sign({ id:user.id }, process.env.JWT_SECRET, {
+            expiresIn: 60*60*24*30 // expires in 24 hours
+          });
+         return res.status(200).json({a: accessToken, r:refreshToken})
+      }
+        
+  })
 app.get("/authenticated/:id", async(req,res)=>{
     const user = await UserQuery.getUserById(req.params.id)
    

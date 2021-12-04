@@ -18,6 +18,7 @@ router.get("/", async(req,res)=>{
 
 router.post("/user-bots", async(req,res)=>{
     // try {
+        console.log("user bots ", req.body.data)
         const bots = await UserQuery.createBots(req.body.data)
          res.status(200).json({bots})
     // } catch (error) {

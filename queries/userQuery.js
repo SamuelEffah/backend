@@ -1,6 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const bcrypt = require("bcryptjs")
+const bcrypt = require("bcryptjs");
+const passport = require('passport');
+
 
 
 
@@ -282,6 +284,7 @@ const getUserById = async(id)=>{
     })
     return user
 }
+
 
 
 const getUserByUsername = async(username)=>{
@@ -869,5 +872,6 @@ module.exports ={
     stats,
     statsCategory,
     createBots,
+   
     topCreators
 }

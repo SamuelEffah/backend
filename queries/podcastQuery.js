@@ -121,6 +121,9 @@ const createPodcast = async(data)=>{
                     APIKey:true,
                     following:true,
                     insertedAt:true
+                   },
+                   data:{
+                       isCreator: true
                    }
                    })
                return newCreator
