@@ -18,7 +18,7 @@ const {passport,router:AuthRoutes} = require("./routes/auth/githubAuth")
 
 // app middleware 
 app.use(session({
-    secret: "fasd43knf8cafsas",
+    secret: "SECRET KEY HERE",
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -29,7 +29,7 @@ app.use(session({
 }))
 
 app.use(cors({
-    origin:["http://localhost:3000", "https://nostalgic-goldstine-c60717.netlify.app"],
+    origin:["http://localhost:3000"],
     methods: "GET, POST, PUT"
 }
 ))
